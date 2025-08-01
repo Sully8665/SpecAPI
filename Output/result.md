@@ -5,7 +5,7 @@
 - **Method**: GET
 - **Expected Status**: 200
 - **Actual Status**: 200
-- **Response Time**: 651ms
+- **Response Time**: 695ms
 - **Result**: ✅ PASSED
 
 ## Post Echo
@@ -13,6 +13,6 @@
 - **Method**: POST
 - **Expected Status**: 200
 - **Actual Status**: 200
-- **Response Time**: 882ms
+- **Response Time**: 1011ms
 - **Result**: ✅ PASSED
 
