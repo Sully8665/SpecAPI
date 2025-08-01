@@ -12,18 +12,61 @@
                 "type": "object",
                 "properties": {
                     "name": { "type": "string" },
-                    "method": { "type": "string" },
+                    "method": {
+                        "type": "string",
+                        "enum": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD" ]
+                    },
                     "url": { "type": "string" },
+                    "queryParams": {
+                        "type": "object",
+                        "additionalProperties": { "type": "string" }
+                    },
                     "headers": {
                         "type": "object",
                         "additionalProperties": { "type": "string" }
                     },
-                    "body": {},
+                    "body": {
+                        "anyOf": [
+                            { "type": "object" },
+                            { "type": "string" },
+                            { "type": "null" }
+                        ]
+                    },
+                    "auth": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [ "none", "basic", "bearer", "apiKey", "oauth2" ]
+                            },
+                            "username": { "type": "string" },
+                            "password": { "type": "string" },
+                            "token": { "type": "string" },
+                            "apiKey": { "type": "string" },
+                            "apiKeyLocation": {
+                                "type": "string",
+                                "enum": [ "header", "query" ]
+                            },
+                            "oauth2TokenUrl": { "type": "string" },
+                            "scopes": {
+                                "type": "array",
+                                "items": { "type": "string" }
+                            }
+                        },
+                        "required": [ "type" ],
+                        "additionalProperties": false
+                    },
                     "expect": {
                         "type": "object",
                         "properties": {
                             "status": { "type": "integer" },
-                            "bodyContains": { "type": [ "string", "null" ] }
+                            "bodyContains": { "type": [ "string", "null" ] },
+                            "bodyEquals": { "type": [ "object", "string", "null" ] },
+                            "headersContains": {
+                                "type": "object",
+                                "additionalProperties": { "type": "string" }
+                            },
+                            "responseTimeMs": { "type": "integer" }
                         },
                         "required": [ "status" ]
                     }
