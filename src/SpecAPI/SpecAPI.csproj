@@ -14,10 +14,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Properties\" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <EditorConfigFiles Remove="D:\Projects\My Projects\SpecAPI\.editorconfig" />
 	</ItemGroup>
 
