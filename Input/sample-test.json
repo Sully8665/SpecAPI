@@ -1,0 +1,19 @@
+{
+  "variables": {
+    "TOKEN": "your_token_here"
+  },
+  "tests": [
+    {
+      "name": "Get User",
+      "method": "GET",
+      "url": "https://api.example.com/user",
+      "headers": {
+        "Authorization": "Bearer {{TOKEN}}"
+      },
+      "expect": {
+        "status": 200,
+        "bodyContains": "username"
+      }
+    }
+  ]
+}
