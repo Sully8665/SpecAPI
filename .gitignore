@@ -40,4 +40,5 @@ obj/
 *.DS_Store
 
 # Output
+/Output
 
