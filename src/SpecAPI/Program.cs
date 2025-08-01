@@ -1,5 +1,7 @@
-using SpecAPI;
-using SpecAPI.Logic;
+using SpecAPI.DependencyInjection;
+using SpecAPI.Interfaces;
+using SpecAPI.Loading;
+using SpecAPI.Services;
 
 class Program
 {
@@ -21,11 +23,17 @@ class Program
 
         try
         {
-            var testCases = TestLoader.Load(yamlPath);
+            // Create service provider
+            var serviceProvider = ServiceContainer.CreateServiceProvider();
 
-            Console.WriteLine($"✅ Loaded {testCases.Count} test case(s).\n");
+            // Get required services
+            var testRunner = (ITestRunner)serviceProvider.GetService(typeof(ITestRunner))!;
+            var loaderFactory = (TestLoaderFactory)serviceProvider.GetService(typeof(TestLoaderFactory))!;
+            var resultReporter = (IResultReporter)serviceProvider.GetService(typeof(IResultReporter))!;
 
-            await TestRunner.RunTests(testCases);
+            // Create and execute test service
+            var testService = new TestExecutionService(testRunner, loaderFactory, resultReporter);
+            await testService.ExecuteTestsAsync(yamlPath);
         }
         catch (Exception ex)
         {

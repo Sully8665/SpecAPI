@@ -1,0 +1,49 @@
+- name: "Test GET Request"
+  request:
+    method: "GET"
+    url: "https://httpbin.org/get"
+    headers:
+      Accept: "application/json"
+  expect:
+    statusCode: 200
+    maxResponseTimeMs: 5000
+
+- name: "Test POST Request"
+  request:
+    method: "POST"
+    url: "https://httpbin.org/post"
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+    body:
+      message: "Hello, World!"
+      timestamp: "2024-01-01T00:00:00Z"
+  expect:
+    statusCode: 200
+    body:
+      json:
+        message: "Hello, World!"
+    maxResponseTimeMs: 5000
+
+- name: "Test Basic Authentication"
+  request:
+    method: "GET"
+    url: "https://httpbin.org/basic-auth/user/passwd"
+    auth:
+      type: "basic"
+      username: "user"
+      password: "passwd"
+  expect:
+    statusCode: 200
+    maxResponseTimeMs: 5000
+
+- name: "Test Bearer Token"
+  request:
+    method: "GET"
+    url: "https://httpbin.org/bearer"
+    auth:
+      type: "bearer"
+      token: "your-token-here"
+  expect:
+    statusCode: 200
+    maxResponseTimeMs: 5000 
