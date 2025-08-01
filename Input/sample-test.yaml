@@ -1,0 +1,15 @@
+- name: Get Google Homepage
+  request:
+    method: GET
+    url: https://www.google.com
+  expect:
+    status: 200
+
+- name: Post Echo
+  request:
+    method: POST
+    url: https://postman-echo.com/post
+    body:
+      message: Hello, world!
+  expect:
+    status: 200
