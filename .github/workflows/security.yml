@@ -1,0 +1,249 @@
+name: Security Scan
+
+on:
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  dependency-check:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Run OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'SpecAPI'
+        path: '.'
+        format: 'HTML'
+        out: 'reports'
+        args: >
+          --failOnCVSS 7
+          --enableRetired
+          --log reports/dependency-check.log
+          
+    - name: Upload dependency check results
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-check-report
+        path: reports/
+        retention-days: 30
+        
+    - name: Comment PR with results
+      uses: actions/github-script@v7
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          try {
+            const logPath = path.join('reports', 'dependency-check.log');
+            if (fs.existsSync(logPath)) {
+              const logContent = fs.readFileSync(logPath, 'utf8');
+              const vulnerabilities = logContent.match(/Found (\d+) vulnerabilities/);
+              
+              if (vulnerabilities && parseInt(vulnerabilities[1]) > 0) {
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `⚠️ **Security Alert**: Found ${vulnerabilities[1]} vulnerabilities in dependencies. Please review the dependency check report.`
+                });
+              }
+            }
+          } catch (error) {
+            console.log('Error processing dependency check results:', error);
+          }
+
+  code-scanning:
+    name: Code Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: csharp
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Build project
+      run: dotnet build src/SpecAPI/SpecAPI.csproj
+        
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/owasp-top-ten
+        output-format: sarif
+        output-file: semgrep-results.sarif
+        
+    - name: Upload Semgrep results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: semgrep-results.sarif
+
+  container-security:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: docker build -t specapi:security-scan .
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'specapi:security-scan'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: trivy-results.sarif
+        
+    - name: Run Hadolint for Dockerfile linting
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+        format: sarif
+        output-file: hadolint-results.sarif
+        
+    - name: Upload Hadolint results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: hadolint-results.sarif
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Run TruffleHog
+      uses: trufflesecurity/trufflehog@main
+      with:
+        args: --only-verified --format sarif --output trufflehog-results.sarif
+        
+    - name: Upload TruffleHog results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: trufflehog-results.sarif
+        
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: --report-format sarif --report-path gitleaks-results.sarif
+        
+    - name: Upload Gitleaks results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: gitleaks-results.sarif
+
+  compliance-check:
+    name: Compliance and Standards Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run License Check
+      run: |
+        # Check for license file
+        if [ ! -f "LICENSE" ]; then
+          echo "❌ No LICENSE file found"
+          exit 1
+        fi
+        echo "✅ LICENSE file found"
+        
+    - name: Check for Security Policy
+      run: |
+        # Check for security policy
+        if [ ! -f ".github/SECURITY.md" ]; then
+          echo "⚠️ No SECURITY.md file found"
+        else
+          echo "✅ SECURITY.md file found"
+        fi
+        
+    - name: Validate .gitignore
+      run: |
+        # Check if sensitive files are properly ignored
+        if grep -q "*.key" .gitignore && grep -q "*.pem" .gitignore; then
+          echo "✅ Sensitive files are properly ignored"
+        else
+          echo "⚠️ Consider adding more sensitive file patterns to .gitignore"
+        fi
+        
+    - name: Check for Environment Variables
+      run: |
+        # Check for hardcoded secrets in code
+        if grep -r "password\|secret\|key\|token" src/ --include="*.cs" | grep -v "//" | grep -v "TODO"; then
+          echo "⚠️ Potential hardcoded secrets found in code"
+        else
+          echo "✅ No obvious hardcoded secrets found"
+        fi
+
+  security-notification:
+    name: Security Notification
+    runs-on: ubuntu-latest
+    needs: [dependency-check, code-scanning, container-security, secrets-scan, compliance-check]
+    if: always()
+    
+    steps:
+    - name: Send security summary
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#security'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        text: |
+          🔒 **Security Scan Summary**
+          
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref }}
+          
+          Jobs completed:
+          - Dependency Check: ${{ needs.dependency-check.result }}
+          - Code Scanning: ${{ needs.code-scanning.result }}
+          - Container Security: ${{ needs.container-security.result }}
+          - Secrets Detection: ${{ needs.secrets-scan.result }}
+          - Compliance Check: ${{ needs.compliance-check.result }}
+          
+          View results: ${{ github.server_url }}/${{ github.repository }}/security/code-scanning
+      if: always() 

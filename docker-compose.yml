@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  specapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specapi-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Examples:/app/examples
+      - ./Output:/app/output
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Development
+    command: ["dotnet", "SpecAPI.dll", "/app/examples/example-test.yaml"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  specapi-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: specapi-test
+    volumes:
+      - ./Examples:/app/examples
+      - ./Output:/app/output
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Testing
+    command: ["dotnet", "SpecAPI.dll", "/app/examples/example-test.yaml"]
+    depends_on:
+      - specapi
+    profiles:
+      - test
+
+  # Mock API server for testing
+  mock-api:
+    image: mockserver/mockserver:latest
+    container_name: mock-api-server
+    ports:
+      - "1080:1080"
+    environment:
+      MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+    volumes:
+      - ./mockserver:/config
+    command: ["-serverPort", "1080", "-logLevel", "INFO"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1080/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Database for future features (if needed)
+  postgres:
+    image: postgres:15-alpine
+    container_name: specapi-db
+    environment:
+      POSTGRES_DB: specapi
+      POSTGRES_USER: specapi_user
+      POSTGRES_PASSWORD: specapi_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U specapi_user -d specapi"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    profiles:
+      - full
+
+  # Redis for caching (if needed)
+  redis:
+    image: redis:7-alpine
+    container_name: specapi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    profiles:
+      - full
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: specapi-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - specapi
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: specapi-network 

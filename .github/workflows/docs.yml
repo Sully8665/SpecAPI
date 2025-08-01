@@ -1,0 +1,181 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'README.md'
+      - 'docs/**'
+      - 'src/**/*.cs'
+      - 'Examples/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'README.md'
+      - 'docs/**'
+      - 'src/**/*.cs'
+      - 'Examples/**'
+
+jobs:
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Install DocFX
+      run: |
+        dotnet tool install -g docfx
+        echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+        
+    - name: Generate API Documentation
+      run: |
+        # Create docfx.json if it doesn't exist
+        if [ ! -f "docfx.json" ]; then
+          docfx init -q
+        fi
+        
+        # Generate documentation
+        docfx docfx.json
+        
+    - name: Build Documentation Site
+      run: docfx build docfx.json
+      
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: _site/
+        retention-days: 30
+
+  validate-links:
+    name: Validate Documentation Links
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install markdown-link-check
+      run: npm install -g markdown-link-check
+        
+    - name: Check markdown links
+      run: |
+        find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
+          echo "Checking $file..."
+          markdown-link-check "$file" || exit 1
+        done
+        
+    - name: Check for broken links in README
+      run: |
+        markdown-link-check README.md --config .markdown-link-check.json || exit 1
+
+  spell-check:
+    name: Spell Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install cspell
+      run: npm install -g cspell
+        
+    - name: Run spell check
+      run: |
+        cspell "**/*.md" "**/*.cs" "**/*.yaml" "**/*.yml" "**/*.json" --config .cspell.json
+
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: [generate-docs, validate-links, spell-check]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download documentation artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: documentation
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site
+        destination_dir: docs
+        
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3
+      with:
+        publish-dir: './_site'
+        production-branch: main
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        deploy-message: "Deploy from GitHub Actions"
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+    - name: Notify documentation deployment
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#documentation'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        text: |
+          📚 **Documentation Updated**
+          
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref }}
+          
+          Documentation has been deployed to:
+          - GitHub Pages: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/docs/
+          - Netlify: https://specapi-docs.netlify.app
+      if: always()
+
+  update-readme:
+    name: Update README Badges
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Update README with latest badges
+      run: |
+        # Update build status badge
+        sed -i 's|https://github.com/.*/workflows/.*/badge.svg|https://github.com/${{ github.repository }}/workflows/CI%2FCD%20Pipeline/badge.svg|g' README.md
+        
+        # Update coverage badge
+        sed -i 's|https://codecov.io/gh/.*/branch/.*/graph/badge.svg|https://codecov.io/gh/${{ github.repository }}/branch/main/graph/badge.svg|g' README.md
+        
+        # Update license badge
+        sed -i 's|https://img.shields.io/badge/license-.*-blue.svg|https://img.shields.io/badge/license-MIT-blue.svg|g' README.md
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git commit -m "Update README badges" || exit 0
+        git push 

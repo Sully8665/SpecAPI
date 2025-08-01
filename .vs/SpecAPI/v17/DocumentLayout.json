@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Projects\\Cursor\\SpecAPI\\",
+  "WorkspaceRootPath": "D:\\Projects\\My Projects\\SpecAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\My Projects\\SpecAPI\\REFACTORING_NOTES.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:REFACTORING_NOTES.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     }
   ],
@@ -20,9 +20,9 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "REFACTORING_NOTES.md",
-              "DocumentMoniker": "D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md",
+              "DocumentMoniker": "D:\\Projects\\My Projects\\SpecAPI\\REFACTORING_NOTES.md",
               "RelativeDocumentMoniker": "REFACTORING_NOTES.md",
-              "ToolTip": "D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md",
+              "ToolTip": "D:\\Projects\\My Projects\\SpecAPI\\REFACTORING_NOTES.md",
               "RelativeToolTip": "REFACTORING_NOTES.md",
               "ViewState": "AgIAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
