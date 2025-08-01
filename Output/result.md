@@ -1,3 +1,3 @@
 | Test | Status | Time (ms) | Passed |
 |------|--------|-----------|--------|
-| Sample Test | 200 | 713 | ✅ |
+| Get User | 0 | 21096 | ❌ |
