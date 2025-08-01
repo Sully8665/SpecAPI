@@ -1,6 +1,7 @@
 # Build results
 bin/
 obj/
+Output/
 
 # User-specific files
 *.user
@@ -38,7 +39,3 @@ obj/
 
 # Others
 *.DS_Store
-
-# Output
-/Output
-
