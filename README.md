@@ -84,10 +84,6 @@ Test results are shown in the console and saved in Output/result.md as a Markdow
 Extending SpecAPI
 Future improvements can include:
 
-More advanced validation (e.g., partial JSON matching, header validation)
-
-Support for other protocols or authentication methods
-
 Parallel test execution
 
 A web-based UI to create, run, and view tests
