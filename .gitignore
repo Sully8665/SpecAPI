@@ -11,7 +11,8 @@ obj/
 # Rider
 .idea/
 
-# VS Code
+# VS
+.vs/
 .vscode/
 
 # NuGet Packages

@@ -1,0 +1,15 @@
+- name: Get Google Homepage
+  request:
+    method: GET
+    url: "https://www.google.com"
+  expect:
+    statusCode: 200
+
+- name: Get GitHub API root
+  request:
+    method: GET
+    url: "https://api.github.com"
+    headers:
+      User-Agent: "SpecAPI-Client"
+  expect:
+    statusCode: 200
