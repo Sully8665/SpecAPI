@@ -1,10 +1,10 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\Projects\\My Projects\\SpecAPI\\",
+  "WorkspaceRootPath": "D:\\Projects\\Cursor\\SpecAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\My Projects\\SpecAPI\\src\\SpecAPI.Tests\\TestLoaderTests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\SpecAPI.Tests\\TestLoaderTests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:REFACTORING_NOTES.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "TestLoaderTests.cs",
-              "DocumentMoniker": "D:\\Projects\\My Projects\\SpecAPI\\src\\SpecAPI.Tests\\TestLoaderTests.cs",
-              "RelativeDocumentMoniker": "src\\SpecAPI.Tests\\TestLoaderTests.cs",
-              "ToolTip": "D:\\Projects\\My Projects\\SpecAPI\\src\\SpecAPI.Tests\\TestLoaderTests.cs",
-              "RelativeToolTip": "src\\SpecAPI.Tests\\TestLoaderTests.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAgAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-01T18:38:28.416Z",
+              "Title": "REFACTORING_NOTES.md",
+              "DocumentMoniker": "D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md",
+              "RelativeDocumentMoniker": "REFACTORING_NOTES.md",
+              "ToolTip": "D:\\Projects\\Cursor\\SpecAPI\\REFACTORING_NOTES.md",
+              "RelativeToolTip": "REFACTORING_NOTES.md",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-08-01T22:17:12.88Z",
               "EditorCaption": ""
             }
           ]

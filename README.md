@@ -1,91 +1,290 @@
-# SpecAPI
+# SpecAPI 🚀
 
-SpecAPI is a simple and extensible API testing tool that runs HTTP tests defined in YAML or JSON files, and generates a Markdown report with test results.
+A modern, extensible API testing framework built with .NET 8 that allows you to define and execute HTTP API tests using YAML or JSON specifications. SpecAPI provides comprehensive validation, authentication support, and detailed reporting capabilities.
 
----
+## ✨ Features
 
-## Features
+### Core Functionality
+- **Multi-format Support**: Define tests in YAML or JSON format
+- **HTTP Methods**: Support for GET, POST, PUT, DELETE, PATCH, and more
+- **Request Configuration**: Headers, request bodies, and custom configurations
+- **Response Validation**: Status codes, response bodies, headers, and response time validation
+- **Authentication**: Built-in support for Basic Auth, Bearer Token, and API Key authentication
+- **Variable Support**: Use variables in your test specifications for dynamic testing
+- **Detailed Reporting**: Console output and comprehensive Markdown reports
 
-- Define API tests with requests and expected responses in YAML
-- Supports HTTP methods, headers, request bodies, and expected status codes and response bodies
-- Reports test results in console and outputs a detailed Markdown report (`Output/result.md`)
-- Basic validation of status code, response body, and optional max response time
-- Easily extensible to support more advanced testing features
+### Architecture & Design
+- **SOLID Principles**: Clean, maintainable code following SOLID design principles
+- **Dependency Injection**: Modular architecture with IoC container
+- **Extensible Framework**: Easy to extend with custom validators, authentication handlers, and reporters
+- **Async/Await**: Full async support for better performance
+- **Error Handling**: Comprehensive error handling and logging
 
----
+### Validation Capabilities
+- **Status Code Validation**: Verify expected HTTP status codes
+- **Response Body Validation**: JSON comparison and content validation
+- **Header Validation**: Verify expected response headers
+- **Response Time Validation**: Performance testing with configurable timeouts
+- **Custom Validators**: Extensible validation framework
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later installed on your system
+### Installation & Usage
 
-### Build and Run
-
-1. Clone the repository or download the source code.
-
-2. Open a terminal in the project directory.
-
-3. Build the project:
-
+1. **Clone the repository**
    ```bash
-   dotnet build
+   git clone <repository-url>
+   cd SpecAPI
+   ```
 
-4. Run tests by specifying a YAML or JSON test file path:
-	dotnet run -- input/sample-test.yaml
+2. **Build the project**
+   ```bash
+   dotnet build src/SpecAPI/SpecAPI.csproj
+   ```
 
-Writing Tests
-Tests are defined as a list in YAML or JSON format. Each test case consists of:
+3. **Run tests**
+   ```bash
+   dotnet run --project src/SpecAPI/SpecAPI.csproj Examples/example-test.yaml
+   ```
 
-name: a descriptive test name
+## 📝 Test Specification Format
 
-request: HTTP request details
-
-method: HTTP method (GET, POST, etc.)
-
-url: full URL of the API endpoint
-
-headers: optional dictionary of HTTP headers
-
-body: optional request body as a string
-
-expect: expected results
-
-statusCode: expected HTTP status code (e.g., 200)
-
-body: optional expected JSON object or string to compare response body
-
-headers: optional expected headers (key-value pairs)
-
-maxResponseTimeMs: optional max response time in milliseconds
-
-Example YAML test file:
-- name: Get Google Homepage
+### Basic Test Structure
+```yaml
+- name: "Test Description"
   request:
-    method: GET
-    url: "https://www.google.com"
-  expect:
-    statusCode: 200
-
-- name: Get GitHub API root
-  request:
-    method: GET
-    url: "https://api.github.com"
+    method: "GET"
+    url: "https://api.example.com/endpoint"
     headers:
-      User-Agent: "SpecAPI-Client"
+      Accept: "application/json"
+      Authorization: "Bearer your-token"
+    body:
+      key: "value"
   expect:
     statusCode: 200
     body:
-      current_user_url: "https://api.github.com/user"
+      expected_field: "expected_value"
+    headers:
+      Content-Type: "application/json"
+    maxResponseTimeMs: 5000
+```
 
-Output
-Test results are shown in the console and saved in Output/result.md as a Markdown report with detailed information about each test.
+### Authentication Examples
 
-Extending SpecAPI
-Future improvements can include:
+#### Basic Authentication
+```yaml
+- name: "Basic Auth Test"
+  request:
+    method: "GET"
+    url: "https://api.example.com/protected"
+    auth:
+      type: "basic"
+      username: "your-username"
+      password: "your-password"
+  expect:
+    statusCode: 200
+```
 
-Parallel test execution
+#### Bearer Token Authentication
+```yaml
+- name: "Bearer Token Test"
+  request:
+    method: "GET"
+    url: "https://api.example.com/protected"
+    auth:
+      type: "bearer"
+      token: "your-jwt-token"
+  expect:
+    statusCode: 200
+```
 
-A web-based UI to create, run, and view tests
+#### API Key Authentication
+```yaml
+- name: "API Key Test"
+  request:
+    method: "GET"
+    url: "https://api.example.com/protected"
+    auth:
+      type: "apikey"
+      in: "header"  # or "query"
+      name: "X-API-Key"
+      value: "your-api-key"
+  expect:
+    statusCode: 200
+```
 
-CI/CD integration support
+### Variables Support
+```yaml
+variables:
+  base_url: "https://api.example.com"
+  api_key: "your-api-key"
+
+- name: "Test with Variables"
+  request:
+    method: "GET"
+    url: "{{base_url}}/users"
+    auth:
+      type: "apikey"
+      in: "header"
+      name: "X-API-Key"
+      value: "{{api_key}}"
+  expect:
+    statusCode: 200
+```
+
+## 📊 Output & Reporting
+
+### Console Output
+SpecAPI provides real-time console output showing:
+- Test execution progress
+- Pass/fail status with emojis
+- Response times
+- Error details
+
+### Markdown Reports
+Detailed reports are generated in `Output/result.md` containing:
+- Test summary with pass/fail counts
+- Individual test results with request/response details
+- Response times and validation results
+- Error messages and stack traces
+
+Example report structure:
+```markdown
+# Test Results
+
+## Test Name
+- **URL**: https://api.example.com/endpoint
+- **Method**: GET
+- **Expected Status**: 200
+- **Actual Status**: 200
+- **Response Time**: 245ms
+- **Result**: ✅ PASSED
+```
+
+## 🏗️ Architecture
+
+### Core Components
+
+#### Test Execution Pipeline
+```
+Test Specification → Test Loader → Test Runner → Validators → Reporter
+```
+
+#### Key Interfaces
+- `ITestLoader`: Loads test specifications from YAML/JSON
+- `ITestRunner`: Executes HTTP requests
+- `IValidator`: Validates responses
+- `IAuthenticationHandler`: Handles authentication
+- `IResultReporter`: Generates reports
+
+#### Service Architecture
+- **TestExecutionService**: Orchestrates the entire test execution
+- **HttpTestRunner**: Executes HTTP requests using HttpClient
+- **ValidationManager**: Coordinates validation across multiple validators
+- **AuthenticationManager**: Manages different authentication types
+- **ServiceContainer**: Dependency injection container
+
+### Extensibility Points
+
+#### Custom Validators
+```csharp
+public class CustomValidator : IValidator
+{
+    public ValidationResult Validate(TestResult result, Expect expect)
+    {
+        // Custom validation logic
+        return new ValidationResult { IsValid = true };
+    }
+}
+```
+
+#### Custom Authentication Handlers
+```csharp
+public class CustomAuthHandler : IAuthenticationHandler
+{
+    public void ApplyAuthentication(HttpRequestMessage request, Auth auth)
+    {
+        // Custom authentication logic
+    }
+}
+```
+
+#### Custom Reporters
+```csharp
+public class CustomReporter : IResultReporter
+{
+    public void ReportResults(List<TestResult> results)
+    {
+        // Custom reporting logic
+    }
+}
+```
+
+## 🔧 Configuration
+
+### Project Structure
+```
+SpecAPI/
+├── src/SpecAPI/
+│   ├── Authentication/     # Authentication handlers
+│   ├── DependencyInjection/ # IoC container setup
+│   ├── Interfaces/         # Core interfaces
+│   ├── Loading/           # Test specification loaders
+│   ├── Models/            # Data models
+│   ├── Reporting/         # Report generators
+│   ├── Running/           # Test execution
+│   ├── Services/          # Core services
+│   ├── Utils/             # Utilities
+│   └── Validation/        # Response validators
+├── Examples/              # Sample test files
+└── Output/                # Generated reports
+```
+
+## 🚀 Future Enhancements
+
+### Planned Features
+- **Parallel Test Execution**: Run multiple tests concurrently
+- **Web UI**: Browser-based interface for test creation and management
+- **CI/CD Integration**: Native support for GitHub Actions, Azure DevOps, etc.
+- **Test Suites**: Organize tests into suites with shared configurations
+- **Data-Driven Testing**: Support for CSV/Excel data sources
+- **Performance Testing**: Load testing and performance metrics
+- **Mock Server**: Built-in mock server for testing
+- **GraphQL Support**: Native GraphQL query testing
+- **WebSocket Testing**: Real-time communication testing
+- **Custom Assertions**: DSL for complex validation scenarios
+
+### Advanced Features
+- **Test Environment Management**: Multiple environment configurations
+- **Test Data Management**: Dynamic test data generation
+- **Scheduled Testing**: Automated test execution
+- **Test History**: Historical test results and trends
+- **Integration Testing**: Database and external service testing
+- **Security Testing**: Built-in security vulnerability scanning
+- **API Documentation**: Generate API documentation from tests
+- **Contract Testing**: Consumer-driven contract testing
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our contributing guidelines for details on:
+- Code style and standards
+- Testing requirements
+- Pull request process
+- Issue reporting
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: Report bugs and feature requests on GitHub
+- **Documentation**: Check the examples and inline code documentation
+- **Community**: Join our community discussions
+
+---
+
+**Built with ❤️ using .NET 8 and modern software engineering practices**

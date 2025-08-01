@@ -1,11 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Input",
-    "\\Models",
-    "\\Output",
-    "\\Services"
+    "\\Examples"
   ],
-  "SelectedNode": "\\Input\\sample-test.yaml",
+  "SelectedNode": "\\REFACTORING_NOTES.md",
   "PreviewInSolutionExplorer": false
 }
