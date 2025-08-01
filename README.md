@@ -6,7 +6,7 @@ SpecAPI is a simple and extensible API testing tool that runs HTTP tests defined
 
 ## Features
 
-- Define API tests with requests and expected responses in YAML or JSON
+- Define API tests with requests and expected responses in YAML
 - Supports HTTP methods, headers, request bodies, and expected status codes and response bodies
 - Reports test results in console and outputs a detailed Markdown report (`Output/result.md`)
 - Basic validation of status code, response body, and optional max response time
