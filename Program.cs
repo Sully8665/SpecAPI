@@ -5,6 +5,8 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        Console.WriteLine("Welcome to SpecAPI Free version!");
+
         if (args.Length != 1)
         {
             Console.WriteLine("Usage: dotnet run <path-to-yaml-file>");
