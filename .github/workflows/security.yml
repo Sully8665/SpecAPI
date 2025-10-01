@@ -231,7 +231,7 @@ jobs:
       with:
         status: ${{ job.status }}
         channel: '#security'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        #webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
         text: |
           🔒 **Security Scan Summary**
           
